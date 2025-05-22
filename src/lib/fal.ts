@@ -16,6 +16,15 @@ export type InputAsset =
       key: string;
     };
 
+type SliderInput = {
+  min: number;
+  max: number;
+  step: number;
+  default: number;
+};
+
+type ReferenceTask = "ip" | "id" | "style";
+
 export type ApiInfo = {
   endpointId: string;
   label: string;
@@ -25,81 +34,239 @@ export type ApiInfo = {
   inputMap?: Record<string, string>;
   inputAsset?: InputAsset[];
   initialInput?: Record<string, unknown>;
+  sliderInputs?: Record<string, SliderInput>;
   cameraControl?: boolean;
   imageForFrame?: boolean;
   category: "image" | "video" | "music" | "voiceover";
   prompt?: boolean;
+  referenceInputs?: {
+    first?: {
+      imageKey: string;
+      taskKey: string;
+      tasks: ReferenceTask[];
+    };
+    second?: {
+      imageKey: string;
+      taskKey: string;
+      tasks: ReferenceTask[];
+    };
+  };
+  negativePrompt?: boolean;
 };
 
 export const AVAILABLE_ENDPOINTS: ApiInfo[] = [
   {
     endpointId: "fal-ai/flux/dev",
     label: "Flux Dev",
-    description: "Generate a video from a text prompt",
+    description: "",
     cost: "",
     category: "image",
-  },
-  {
-    endpointId: "fal-ai/flux/schnell",
-    label: "Flux Schnell",
-    description: "Generate a video from a text prompt",
-    cost: "",
-    category: "image",
+    initialInput: {
+      image_size: "portrait_16_9",
+      guidance_scale: 20,
+      num_inference_steps: 50,
+      enable_safety_checker: false
+    },
+    sliderInputs: {
+      guidance_scale: {
+        min: 1,
+        max: 20,
+        step: 0.1,
+        default: 20
+      },
+      num_inference_steps: {
+        min: 1,
+        max: 50,
+        step: 1,
+        default: 50
+      }
+    }
   },
   {
     endpointId: "fal-ai/flux-pro/v1.1-ultra",
     label: "Flux Pro 1.1 Ultra",
-    description: "Generate a video from a text prompt",
+    description: "",
     cost: "",
     category: "image",
+    initialInput: {
+      aspect_ratio: "9:16",
+      raw: true,
+      enable_safety_checker: false,
+      safety_tolerance: "6",
+      num_images: 1
+    },
+    sliderInputs: {
+      guidance_scale: {
+        min: 1,
+        max: 20,
+        step: 0.1,
+        default: 20
+      },
+      num_inference_steps: {
+        min: 1,
+        max: 50,
+        step: 1,
+        default: 50
+      },
+      num_images: {
+        min: 1,
+        max: 4,
+        step: 1,
+        default: 1
+      }
+    }
   },
   {
-    endpointId: "fal-ai/stable-diffusion-v35-large",
-    label: "Stable Diffusion 3.5 Large",
-    description: "Image quality, typography, complex prompt understanding",
+    endpointId: "fal-ai/flux-pro/new",
+    label: "Flux Pro New",
+    description: "",
     cost: "",
     category: "image",
+    initialInput: {
+      image_size: "portrait_16_9",
+      guidance_scale: 20,
+      num_inference_steps: 50,
+      enable_safety_checker: false,
+      safety_tolerance: "6"
+    },
+    sliderInputs: {
+      guidance_scale: {
+        min: 1,
+        max: 20,
+        step: 0.1,
+        default: 20
+      },
+      num_inference_steps: {
+        min: 1,
+        max: 50,
+        step: 1,
+        default: 50
+      }
+    }
   },
   {
-    endpointId: "fal-ai/minimax/video-01-live",
-    label: "Minimax Video 01 Live",
-    description: "High quality video, realistic motion and physics",
+    endpointId: "fal-ai/recraft/upscale/crisp",
+    label: "Recraft Upscale Crisp",
+    description: "",
+    cost: "",
+    category: "image",
+    inputAsset: ["image"],
+    initialInput: {
+      enable_safety_checker: false,
+    },
+  },
+  // {
+  //   endpointId: "fal-ai/sana/v1.5/4.8b",
+  //   label: "Sana 4.8B",
+  //   description: "",
+  //   cost: "",
+  //   category: "image",
+  //   negativePrompt: true,
+  //   initialInput: {
+  //     image_size: "portrait_16_9",
+  //     guidance_scale: 20,
+  //     num_inference_steps: 50,
+  //     enable_safety_checker: false,
+  //     negative_prompt: ""
+  //   },
+  //   sliderInputs: {
+  //     guidance_scale: {
+  //       min: 1,
+  //       max: 20,
+  //       step: 0.1,
+  //       default: 20
+  //     },
+  //     num_inference_steps: {
+  //       min: 1,
+  //       max: 50,
+  //       step: 1,
+  //       default: 50
+  //     }
+  //   }
+  // },
+    
+  // {
+  //   endpointId: "fal-ai/dreamo",
+  //   label: "Dreamo",
+  //   description: "",
+  //   cost: "",
+  //   category: "image",
+  //   initialInput: {
+  //     image_size: "portrait_16_9",
+  //     guidance_scale: 20,
+  //     num_inference_steps: 50,
+  //     enable_safety_checker: false,
+  //     first_reference_task: "ip",
+  //     second_reference_task: "ip",
+  //     negative_prompt: ""
+  //   },
+  //   referenceInputs: {
+  //     first: {
+  //       imageKey: "first_image_url",
+  //       taskKey: "first_reference_task",
+  //       tasks: ["ip", "id", "style"]
+  //     },
+  //     second: {
+  //       imageKey: "second_image_url", 
+  //       taskKey: "second_reference_task",
+  //       tasks: ["ip", "id", "style"]
+  //     }
+  //   }
+  // },
+  // {
+  //   endpointId: "fal-ai/stable-diffusion-v35-large",
+  //   label: "Stable Diffusion 3.5 Large",
+  //   description: "Image quality, typography, complex prompt understanding",
+  //   cost: "",
+  //   category: "image",
+  //   initialInput: {
+  //     enable_safety_checker: false,
+  //   },
+  // },
+  // {
+  //   endpointId: "fal-ai/minimax/video-01-live",
+  //   label: "Minimax Video 01 Live",
+  //   description: "High quality video, realistic motion and physics",
+  //   cost: "",
+  //   category: "video",
+  //   inputAsset: ["image"],
+  // },
+  {
+    endpointId: "fal-ai/wan-pro",
+    label: "Wan-2.1 Pro",
+    description: "",
     cost: "",
     category: "video",
     inputAsset: ["image"],
+    initialInput: {
+      enable_safety_checker: false
+    }
   },
   {
-    endpointId: "fal-ai/hunyuan-video",
-    label: "Hunyuan",
-    description: "High visual quality, motion diversity and text alignment",
-    cost: "",
-    category: "video",
-  },
-  {
-    endpointId: "fal-ai/kling-video/v1.5/pro",
-    label: "Kling 1.5 Pro",
+    endpointId: "fal-ai/kling-video/v2/master",
+    label: "Kling 2.0 Master",
     description: "High quality video",
     cost: "",
     category: "video",
     inputAsset: ["image"],
   },
   {
-    endpointId: "fal-ai/kling-video/v1/standard/text-to-video",
-    label: "Kling 1.0 Standard",
-    description: "High quality video",
+    endpointId: "fal-ai/kling-video/v1.6/pro",
+    label: "Kling 1.6 Pro",
+    description: "",
     cost: "",
     category: "video",
-    inputAsset: [],
+    inputAsset: ["image"],
     cameraControl: true,
   },
-  {
-    endpointId: "fal-ai/luma-dream-machine",
-    label: "Luma Dream Machine 1.5",
-    description: "High quality video",
-    cost: "",
-    category: "video",
-    inputAsset: ["image"],
-  },
+  // {
+  //   endpointId: "fal-ai/luma-dream-machine",
+  //   label: "Luma Dream Machine 1.5",
+  //   description: "High quality video",
+  //   cost: "",
+  //   category: "video",
+  //   inputAsset: ["image"],
+  // },
   {
     endpointId: "fal-ai/minimax-music",
     label: "Minimax Music",
@@ -114,24 +281,24 @@ export const AVAILABLE_ENDPOINTS: ApiInfo[] = [
       },
     ],
   },
-  {
-    endpointId: "fal-ai/mmaudio-v2",
-    label: "MMAudio V2",
-    description:
-      "MMAudio generates synchronized audio given video and/or text inputs. It can be combined with video models to get videos with audio.",
-    cost: "",
-    inputAsset: ["video"],
-    category: "video",
-  },
-  {
-    endpointId: "fal-ai/sync-lipsync",
-    label: "sync.so -- lipsync 1.8.0",
-    description:
-      "Generate realistic lipsync animations from audio using advanced algorithms for high-quality synchronization.",
-    cost: "",
-    inputAsset: ["video", "audio"],
-    category: "video",
-  },
+  // {
+  //   endpointId: "fal-ai/mmaudio-v2",
+  //   label: "MMAudio V2",
+  //   description:
+  //     "MMAudio generates synchronized audio given video and/or text inputs. It can be combined with video models to get videos with audio.",
+  //   cost: "",
+  //   inputAsset: ["video"],
+  //   category: "video",
+  // },
+  // {
+  //   endpointId: "fal-ai/sync-lipsync",
+  //   label: "sync.so -- lipsync 1.8.0",
+  //   description:
+  //     "Generate realistic lipsync animations from audio using advanced algorithms for high-quality synchronization.",
+  //   cost: "",
+  //   inputAsset: ["video", "audio"],
+  //   category: "video",
+  // },
   {
     endpointId: "fal-ai/stable-audio",
     label: "Stable Audio",
@@ -193,23 +360,24 @@ export const AVAILABLE_ENDPOINTS: ApiInfo[] = [
       "Veo creates videos with realistic motion and high quality output, up to 4K.",
     cost: "",
     category: "video",
+    inputAsset: ["image"],
   },
-  {
-    endpointId: "fal-ai/ltx-video-v095/multiconditioning",
-    label: "LTX Video v0.95 Multiconditioning",
-    description: "Generate videos from prompts,images using LTX Video-0.9.5",
-    cost: "",
-    imageForFrame: true,
-    category: "video",
-  },
-  {
-    endpointId: "fal-ai/topaz/upscale/video",
-    label: "Topaz Video Upscale",
-    description:
-      "Professional-grade video upscaling using Topaz technology. Enhance your videos with high-quality upscaling.",
-    cost: "",
-    category: "video",
-    prompt: false,
-    inputAsset: ["video"],
-  },
+  // {
+  //   endpointId: "fal-ai/ltx-video-v095/multiconditioning",
+  //   label: "LTX Video v0.95 Multiconditioning",
+  //   description: "Generate videos from prompts,images using LTX Video-0.9.5",
+  //   cost: "",
+  //   imageForFrame: true,
+  //   category: "video",
+  // },
+  // {
+  //   endpointId: "fal-ai/topaz/upscale/video",
+  //   label: "Topaz Video Upscale",
+  //   description:
+  //     "Professional-grade video upscaling using Topaz technology. Enhance your videos with high-quality upscaling.",
+  //   cost: "",
+  //   category: "video",
+  //   prompt: false,
+  //   inputAsset: ["video"],
+  // },
 ];

@@ -56,6 +56,8 @@ import { LoadingIcon } from "./ui/icons";
 import { getMediaMetadata } from "@/lib/ffmpeg";
 import CameraMovement from "./camera-control";
 import VideoFrameSelector from "./video-frame-selector";
+import { Slider } from "./ui/slider";
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
 type ModelEndpointPickerProps = {
   mediaType: string;
@@ -86,6 +88,104 @@ function ModelEndpointPicker({
         ))}
       </SelectContent>
     </Select>
+  );
+}
+
+function ReferenceImageInput({
+  label,
+  imageKey,
+  taskKey,
+  tasks,
+  generateData,
+  setGenerateData,
+  mediaItems,
+  setTab,
+  isUploading,
+  onFileUpload,
+}: {
+  label: string;
+  imageKey: string;
+  taskKey: string;
+  tasks: string[];
+  generateData: GenerateData;
+  setGenerateData: (data: Partial<GenerateData>) => void;
+  mediaItems: MediaItem[];
+  setTab: (tab: string) => void;
+  isUploading: boolean;
+  onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <Label>{label}</Label>
+      <div className="flex gap-2">
+        <div className="flex-1">
+          {!generateData[imageKey] ? (
+            <div className="flex flex-col gap-2">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => setTab(`asset-${imageKey}`)}
+              >
+                Select Reference Image
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={isUploading}
+                className="w-full"
+                asChild
+              >
+                <label>
+                  <Input
+                    type="file"
+                    className="hidden"
+                    onChange={onFileUpload}
+                    multiple={false}
+                    disabled={isUploading}
+                    accept="image/*"
+                  />
+                  {isUploading ? (
+                    <LoaderCircleIcon className="w-4 h-4 opacity-50 animate-spin" />
+                  ) : (
+                    <span>Upload Image</span>
+                  )}
+                </label>
+              </Button>
+            </div>
+          ) : (
+            <div className="relative">
+              <img 
+                src={generateData[imageKey]} 
+                className="w-full h-32 object-cover rounded-md"
+                alt="Reference"
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-1 right-1 bg-black/50"
+                onClick={() => setGenerateData({ [imageKey]: null })}
+              >
+                <TrashIcon className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
+        <RadioGroup
+          value={generateData[taskKey] || "ip"}
+          onValueChange={(value) => setGenerateData({ [taskKey]: value })}
+          className="flex flex-col gap-1"
+        >
+          {tasks.map((task) => (
+            <div key={task} className="flex items-center space-x-2">
+              <RadioGroupItem value={task} id={`${taskKey}-${task}`} />
+              <Label htmlFor={`${taskKey}-${task}`} className="uppercase">
+                {task}
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
+      </div>
+    </div>
   );
 }
 
@@ -322,6 +422,14 @@ export default function RightPanel({
     try {
       const uploadedFiles = await startUpload(Array.from(files));
       if (uploadedFiles) {
+        // Handle reference image upload
+        if (tab.startsWith('asset-')) {
+          const imageKey = tab.replace('asset-', '');
+          setGenerateData({ [imageKey]: uploadedFiles[0].url });
+          return;
+        }
+
+        // Handle existing upload logic
         await handleUploadComplete(uploadedFiles);
       }
     } catch (err) {
@@ -384,7 +492,7 @@ export default function RightPanel({
         generateDialogOpen ? "right-0" : "-right-[450px]",
       )}
     >
-      <div className="flex-1 p-4 flex flex-col gap-4 border-b border-border h-full overflow-hidden relative">
+      <div className="flex-1 p-4 flex flex-col gap-4 border-b border-border h-full overflow-y-auto relative">
         <div className="flex flex-row items-center justify-between">
           <h2 className="text-sm text-muted-foreground font-semibold flex-1">
             Generate Media
@@ -608,6 +716,27 @@ export default function RightPanel({
             </div>
           )}
         </div>
+        {tab === "generation" && endpoint?.sliderInputs && (
+          <div className="flex flex-col gap-4">
+            {Object.entries(endpoint.sliderInputs).map(([key, config]) => (
+              <div key={key} className="flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <Label className="capitalize">{key.replace(/_/g, ' ')}</Label>
+                  <span className="text-sm text-muted-foreground">
+                    {generateData[key] ?? config.default}
+                  </span>
+                </div>
+                <Slider
+                  min={config.min}
+                  max={config.max}
+                  step={config.step}
+                  value={[generateData[key] ?? config.default]}
+                  onValueChange={([value]) => setGenerateData({ [key]: value })}
+                />
+              </div>
+            ))}
+          </div>
+        )}
         {tab === "generation" && (
           <div className="flex flex-col gap-2 mb-2">
             {endpoint?.imageForFrame && (
@@ -667,6 +796,49 @@ export default function RightPanel({
                 )}
               </div>
             )}
+            {endpoint?.referenceInputs && (
+              <div className="flex flex-col gap-4">
+                {endpoint.referenceInputs.first && (
+                  <ReferenceImageInput
+                    label="First Reference Image"
+                    imageKey={endpoint.referenceInputs.first.imageKey}
+                    taskKey={endpoint.referenceInputs.first.taskKey}
+                    tasks={endpoint.referenceInputs.first.tasks}
+                    generateData={generateData}
+                    setGenerateData={setGenerateData}
+                    mediaItems={mediaItems}
+                    setTab={setTab}
+                    isUploading={isUploading}
+                    onFileUpload={handleFileUpload}
+                  />
+                )}
+                {endpoint.referenceInputs.second && (
+                  <ReferenceImageInput
+                    label="Second Reference Image"
+                    imageKey={endpoint.referenceInputs.second.imageKey}
+                    taskKey={endpoint.referenceInputs.second.taskKey}
+                    tasks={endpoint.referenceInputs.second.tasks}
+                    generateData={generateData}
+                    setGenerateData={setGenerateData}
+                    mediaItems={mediaItems}
+                    setTab={setTab}
+                    isUploading={isUploading}
+                    onFileUpload={handleFileUpload}
+                  />
+                )}
+              </div>
+            )}
+            {endpoint?.negativePrompt && (
+              <div className="flex flex-col gap-2">
+                <Label>Negative Prompt</Label>
+                <Textarea
+                  placeholder="Enter negative prompt..."
+                  value={generateData.negative_prompt || ""}
+                  onChange={(e) => setGenerateData({ negative_prompt: e.target.value })}
+                  className="min-h-[60px]"
+                />
+              </div>
+            )}
             <div className="flex flex-row gap-2">
               <Button
                 className="w-full"
@@ -675,6 +847,32 @@ export default function RightPanel({
               >
                 Generate
               </Button>
+            </div>
+          </div>
+        )}
+        {tab.startsWith('asset-') && (
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" onClick={() => setTab("generation")}>
+                <ArrowLeft className="h-4 w-4" /> Back
+              </Button>
+              <h3 className="text-sm font-medium">Select Reference Image</h3>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              {mediaItems
+                .filter((media) => media.mediaType === "image")
+                .map((media) => (
+                  <MediaItemRow
+                    key={media.id}
+                    data={media}
+                    draggable={false}
+                    onOpen={() => {
+                      const imageKey = tab.replace('asset-', '');
+                      setGenerateData({ [imageKey]: resolveMediaUrl(media) });
+                      setTab("generation");
+                    }}
+                  />
+                ))}
             </div>
           </div>
         )}
