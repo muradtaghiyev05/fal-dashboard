@@ -154,8 +154,8 @@ function ReferenceImageInput({
             </div>
           ) : (
             <div className="relative">
-              <img 
-                src={generateData[imageKey]} 
+              <img
+                src={generateData[imageKey]}
                 className="w-full h-32 object-cover rounded-md"
                 alt="Reference"
               />
@@ -364,13 +364,16 @@ export default function RightPanel({
         : endpointId,
     mediaType,
     input: {
-      ...(endpoint?.initialInput || {}),
       ...mapInputKey(input, endpoint?.inputMap || {}),
+      ...(endpoint?.initialInput || {}),
       ...extraInput,
     },
   });
 
   const handleOnGenerate = async () => {
+    console.log('Generate Data:', generateData);
+    console.log('Endpoint:', endpoint?.initialInput);
+    
     await createJob.mutateAsync({} as any, {
       onSuccess: async () => {
         if (!createJob.isError) {
@@ -423,8 +426,8 @@ export default function RightPanel({
       const uploadedFiles = await startUpload(Array.from(files));
       if (uploadedFiles) {
         // Handle reference image upload
-        if (tab.startsWith('asset-')) {
-          const imageKey = tab.replace('asset-', '');
+        if (tab.startsWith("asset-")) {
+          const imageKey = tab.replace("asset-", "");
           setGenerateData({ [imageKey]: uploadedFiles[0].url });
           return;
         }
@@ -721,7 +724,7 @@ export default function RightPanel({
             {Object.entries(endpoint.sliderInputs).map(([key, config]) => (
               <div key={key} className="flex flex-col gap-2">
                 <div className="flex justify-between items-center">
-                  <Label className="capitalize">{key.replace(/_/g, ' ')}</Label>
+                  <Label className="capitalize">{key.replace(/_/g, " ")}</Label>
                   <span className="text-sm text-muted-foreground">
                     {generateData[key] ?? config.default}
                   </span>
@@ -834,7 +837,9 @@ export default function RightPanel({
                 <Textarea
                   placeholder="Enter negative prompt..."
                   value={generateData.negative_prompt || ""}
-                  onChange={(e) => setGenerateData({ negative_prompt: e.target.value })}
+                  onChange={(e) =>
+                    setGenerateData({ negative_prompt: e.target.value })
+                  }
                   className="min-h-[60px]"
                 />
               </div>
@@ -850,7 +855,7 @@ export default function RightPanel({
             </div>
           </div>
         )}
-        {tab.startsWith('asset-') && (
+        {tab.startsWith("asset-") && (
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <Button variant="ghost" onClick={() => setTab("generation")}>
@@ -867,7 +872,7 @@ export default function RightPanel({
                     data={media}
                     draggable={false}
                     onOpen={() => {
-                      const imageKey = tab.replace('asset-', '');
+                      const imageKey = tab.replace("asset-", "");
                       setGenerateData({ [imageKey]: resolveMediaUrl(media) });
                       setTab("generation");
                     }}

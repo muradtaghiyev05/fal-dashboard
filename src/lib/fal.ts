@@ -65,22 +65,22 @@ export const AVAILABLE_ENDPOINTS: ApiInfo[] = [
       image_size: "portrait_16_9",
       guidance_scale: 20,
       num_inference_steps: 50,
-      enable_safety_checker: false
+      enable_safety_checker: false,
     },
     sliderInputs: {
       guidance_scale: {
         min: 1,
         max: 20,
         step: 0.1,
-        default: 20
+        default: 20,
       },
       num_inference_steps: {
         min: 1,
         max: 50,
         step: 1,
-        default: 50
-      }
-    }
+        default: 50,
+      },
+    },
   },
   {
     endpointId: "fal-ai/flux-pro/v1.1-ultra",
@@ -93,28 +93,28 @@ export const AVAILABLE_ENDPOINTS: ApiInfo[] = [
       raw: true,
       enable_safety_checker: false,
       safety_tolerance: "6",
-      num_images: 1
+      num_images: 1,
     },
     sliderInputs: {
       guidance_scale: {
         min: 1,
         max: 20,
         step: 0.1,
-        default: 20
+        default: 20,
       },
       num_inference_steps: {
         min: 1,
         max: 50,
         step: 1,
-        default: 50
+        default: 50,
       },
       num_images: {
         min: 1,
         max: 4,
         step: 1,
-        default: 1
-      }
-    }
+        default: 1,
+      },
+    },
   },
   {
     endpointId: "fal-ai/flux-pro/new",
@@ -123,26 +123,26 @@ export const AVAILABLE_ENDPOINTS: ApiInfo[] = [
     cost: "",
     category: "image",
     initialInput: {
-      image_size: "portrait_16_9",
+      image_size: "landscape_16_9",
       guidance_scale: 20,
       num_inference_steps: 50,
       enable_safety_checker: false,
-      safety_tolerance: "6"
+      safety_tolerance: "6",
     },
     sliderInputs: {
       guidance_scale: {
         min: 1,
         max: 20,
         step: 0.1,
-        default: 20
+        default: 20,
       },
       num_inference_steps: {
         min: 1,
         max: 50,
         step: 1,
-        default: 50
-      }
-    }
+        default: 50,
+      },
+    },
   },
   {
     endpointId: "fal-ai/recraft/upscale/crisp",
@@ -184,7 +184,7 @@ export const AVAILABLE_ENDPOINTS: ApiInfo[] = [
   //     }
   //   }
   // },
-    
+
   // {
   //   endpointId: "fal-ai/dreamo",
   //   label: "Dreamo",
@@ -207,7 +207,7 @@ export const AVAILABLE_ENDPOINTS: ApiInfo[] = [
   //       tasks: ["ip", "id", "style"]
   //     },
   //     second: {
-  //       imageKey: "second_image_url", 
+  //       imageKey: "second_image_url",
   //       taskKey: "second_reference_task",
   //       tasks: ["ip", "id", "style"]
   //     }
@@ -239,8 +239,8 @@ export const AVAILABLE_ENDPOINTS: ApiInfo[] = [
     category: "video",
     inputAsset: ["image"],
     initialInput: {
-      enable_safety_checker: false
-    }
+      enable_safety_checker: false,
+    },
   },
   {
     endpointId: "fal-ai/kling-video/v2/master",
